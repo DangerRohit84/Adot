@@ -29,12 +29,12 @@ export default function TeacherDashboard() {
     setLoading(false);
   };
 
-  const currentClass = todayTimetable.find((t: any) =>
+  const currentClass: any = todayTimetable.find((t: any) =>
     t.start_time?.slice(0,5) <= currentTime && t.end_time?.slice(0,5) >= currentTime
   );
-  const nextClass = todayTimetable.find((t: any) => t.start_time?.slice(0,5) > currentTime);
+  const nextClass: any = todayTimetable.find((t: any) => t.start_time?.slice(0,5) > currentTime);
 
-  const activeClass = currentClass || nextClass;
+  const activeClass: any = currentClass || nextClass;
 
   return (
     <div className="space-y-6">

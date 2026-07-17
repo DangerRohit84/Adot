@@ -34,18 +34,18 @@ export default function TeacherTimetablePage() {
 
   const colors = ["bg-blue-50 border-blue-200 text-blue-800", "bg-violet-50 border-violet-200 text-violet-800", "bg-emerald-50 border-emerald-200 text-emerald-800", "bg-amber-50 border-amber-200 text-amber-800", "bg-rose-50 border-rose-200 text-rose-800"];
 
-  const currentSlot = timetable.find((t: any) =>
+  const currentSlot: any = timetable.find((t: any) =>
     t.day_of_week === currentDayShort &&
     t.start_time?.slice(0,5) <= currentTime &&
     t.end_time?.slice(0,5) >= currentTime
   );
 
-  const nextSlot = timetable.find((t: any) =>
+  const nextSlot: any = timetable.find((t: any) =>
     t.day_of_week === currentDayShort &&
     t.start_time?.slice(0,5) > currentTime
   );
 
-  const activeSlot = currentSlot || nextSlot;
+  const activeSlot: any = currentSlot || nextSlot;
 
   return (
     <div className="space-y-6">
