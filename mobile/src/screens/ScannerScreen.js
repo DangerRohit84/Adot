@@ -42,7 +42,7 @@ export default function ScannerScreen({ route, navigation }) {
       });
       const student = res.data?.student;
       setCounts(c => ({ ...c, present: c.present + 1 }));
-      setShowResult({ type: 'success', name: student?.name, roll: student?.roll_number });
+      setShowResult({ type: 'success', name: student?.name, roll: student?.roll_number, floating: res.data?.is_floating });
       Vibration.vibrate(100);
     } catch (e) {
       const code = e.response?.data?.error;
@@ -99,6 +99,7 @@ export default function ScannerScreen({ route, navigation }) {
           <View style={styles.header}>
             <Text style={styles.subject}>{session.subject_name}</Text>
             <Text style={styles.section}>{session.section_name} • P{session.start_period}-{session.end_period}</Text>
+            {session.room_number ? <Text style={styles.room}>📍 {session.room_number}</Text> : null}
           </View>
 
           {/* Scan Frame */}
@@ -114,6 +115,7 @@ export default function ScannerScreen({ route, navigation }) {
               <Text style={styles.resultIcon}>{showResult.type === 'success' ? '✅' : showResult.type === 'duplicate' ? '⏰' : showResult.type === 'offline' ? '📥' : '❌'}</Text>
               <Text style={styles.resultName}>{showResult.name}</Text>
               {showResult.roll && <Text style={styles.resultRoll}>{showResult.roll}</Text>}
+              {showResult.floating && <Text style={styles.resultFloat}>🔄 Floating Student</Text>}
             </View>
           )}
 
@@ -164,6 +166,7 @@ const styles = StyleSheet.create({
   header: { alignItems: 'center' },
   subject: { fontSize: 22, fontWeight: '800', color: '#fff' },
   section: { fontSize: 14, color: '#c7d2fe', marginTop: 4 },
+  room: { fontSize: 13, color: '#6ee7b7', marginTop: 2, fontWeight: '600' },
   scanFrame: { width: 260, height: 260, alignSelf: 'center', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 10 },
   corner: { position: 'absolute', width: 30, height: 30, borderColor: '#6366f1', borderWidth: 3 },
   tl: { top: 0, left: 0, borderRightWidth: 0, borderBottomWidth: 0 },
@@ -175,6 +178,7 @@ const styles = StyleSheet.create({
   resultIcon: { fontSize: 28, marginBottom: 4 },
   resultName: { fontSize: 18, fontWeight: '800', color: '#fff' },
   resultRoll: { fontSize: 13, color: '#e0e7ff', marginTop: 2 },
+  resultFloat: { fontSize: 12, color: '#fef3c7', marginTop: 4, fontWeight: '700' },
   footer: { marginBottom: 30 },
   counts: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 14 },
   countBox: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 10, alignItems: 'center' },

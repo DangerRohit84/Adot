@@ -27,6 +27,7 @@ const menuItems: Record<string, MenuItem[]> = {
     { label: "Teachers", href: "/hod/teachers", icon: <SidebarIcon type="teacher" /> },
     { label: "Scanners", href: "/hod/scanners", icon: <SidebarIcon type="scan" /> },
     { label: "Students", href: "/hod/students", icon: <SidebarIcon type="student" /> },
+    { label: "Floating", href: "/hod/floating", icon: <SidebarIcon type="float" /> },
     { label: "Timetable", href: "/hod/timetable", icon: <SidebarIcon type="calendar" /> },
     { label: "Attendance", href: "/hod/attendance", icon: <SidebarIcon type="check" /> },
     { label: "Year Mgmt", href: "/hod/years", icon: <SidebarIcon type="academic" /> },
@@ -57,6 +58,7 @@ function SidebarIcon({ type }: { type: string }) {
     calendar: <svg className={cls} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>,
     check: <svg className={cls} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>,
     academic: <svg className={cls} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342" /></svg>,
+    float: <svg className={cls} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>,
   };
   return icons[type] || icons.home;
 }

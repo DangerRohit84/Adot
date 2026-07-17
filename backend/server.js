@@ -47,6 +47,7 @@ app.use('/api/users', require('./src/routes/users'));
 app.use('/api/students', require('./src/routes/students'));
 app.use('/api/timetable', require('./src/routes/timetable'));
 app.use('/api/attendance', require('./src/routes/attendance'));
+app.use('/api/floating-students', require('./src/routes/floatingStudents'));
 app.use('/api/reports', require('./src/routes/reports'));
 
 // Health check

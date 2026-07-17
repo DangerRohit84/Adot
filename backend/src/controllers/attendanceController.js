@@ -2,6 +2,7 @@ const AttendanceSession = require('../models/attendanceSession');
 const AttendanceRecord = require('../models/attendanceRecord');
 const Timetable = require('../models/timetable');
 const Student = require('../models/student');
+const FloatingStudent = require('../models/floatingStudent');
 const { emitToCollege } = require('../utils/socket');
 
 const getSessions = async (req, res) => {
@@ -59,6 +60,7 @@ const startSession = async (req, res) => {
 
 const getStudentsForSession = async (session) => {
   const timetable = await Timetable.findById(session.timetable_id);
+  const sectionId = timetable.section_id;
 
   if (timetable.combined_group_id) {
     const combined = await Timetable.findCombinedGroup(
@@ -67,10 +69,16 @@ const getStudentsForSession = async (session) => {
       timetable.start_period
     );
     const sectionIds = combined.map(c => c.section_id);
-    return Student.findBySections(sectionIds);
+    const students = await Student.findBySections(sectionIds);
+    // Also include floating students from other sections targeting these sections
+    const floatingStudents = await Student.findFloatingToSections(sectionIds);
+    return [...students, ...floatingStudents.filter(fs => !students.find(s => s.id === fs.id))];
   }
 
-  return Student.findBySection(timetable.section_id);
+  const students = await Student.findBySection(sectionId);
+  // Include floating students from other sections targeting this section
+  const floatingStudents = await Student.findFloatingToSections([sectionId]);
+  return [...students, ...floatingStudents.filter(fs => !students.find(s => s.id === fs.id))];
 };
 
 const getPeriodsCovered = (session) => {
@@ -116,13 +124,18 @@ const scanStudent = async (req, res) => {
     // Get timetable for period range
     const timetable = await Timetable.findById(session.timetable_id);
 
-    // Validate student belongs to this section
+    // Validate student belongs to this section (or is floating to it)
+    let isFloating = false;
     if (student.section_id !== timetable.section_id) {
-      return res.status(400).json({
-        success: false,
-        error: 'WRONG_SECTION',
-        message: `Student belongs to ${student.section_name}, not this class`,
-      });
+      const allowed = await FloatingStudent.canFloat(student.id, timetable.section_id);
+      if (!allowed) {
+        return res.status(400).json({
+          success: false,
+          error: 'WRONG_SECTION',
+          message: `Student belongs to ${student.section_name}, not this class`,
+        });
+      }
+      isFloating = true;
     }
 
     // Create attendance records for all periods
@@ -159,8 +172,11 @@ const scanStudent = async (req, res) => {
           section: student.section_name,
         },
         status: 'present',
+        is_floating: isFloating,
         periods_marked: records.map(r => r.period_number),
-        message: `Marked present for periods ${timetable.start_period}-${timetable.end_period}`,
+        message: isFloating
+          ? `Floating student marked present for periods ${timetable.start_period}-${timetable.end_period}`
+          : `Marked present for periods ${timetable.start_period}-${timetable.end_period}`,
       }
     });
   } catch (error) {

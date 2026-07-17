@@ -119,6 +119,19 @@ const Student = {
   delete: async (id) => {
     await pool.query('UPDATE students SET is_active = false WHERE id = $1', [id]);
   },
+
+  findFloatingToSections: async (targetSectionIds) => {
+    const result = await pool.query(
+      `SELECT st.*, sec.name as section_name, 'floating' as attendance_type
+       FROM students st
+       JOIN sections sec ON st.section_id = sec.id
+       JOIN floating_students fs ON fs.student_id = st.id
+       WHERE fs.target_section_id = ANY($1) AND fs.is_active = true AND st.is_active = true
+       ORDER BY st.roll_number`,
+      [targetSectionIds]
+    );
+    return result.rows;
+  },
 };
 
 module.exports = Student;

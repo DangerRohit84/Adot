@@ -32,6 +32,7 @@ export default function SessionsScreen({ navigation }) {
       </View>
       <Text style={styles.subject}>{item.subject_name || 'Session'}</Text>
       <Text style={styles.section}>{item.section_name}</Text>
+      {item.room_number ? <Text style={styles.room}>📍 {item.room_number}</Text> : null}
       <Text style={styles.time}>Period {item.start_period}-{item.end_period} • {item.start_time}-{item.end_time}</Text>
     </TouchableOpacity>
   );
@@ -72,6 +73,7 @@ const styles = StyleSheet.create({
   date: { fontSize: 12, color: '#94a3b8' },
   subject: { fontSize: 18, fontWeight: '700', color: '#1e293b' },
   section: { fontSize: 14, color: '#6366f1', fontWeight: '600', marginTop: 2 },
+  room: { fontSize: 13, color: '#059669', fontWeight: '600', marginTop: 2 },
   time: { fontSize: 12, color: '#94a3b8', marginTop: 4 },
   empty: { alignItems: 'center', marginTop: 80 },
   emptyIcon: { fontSize: 64, marginBottom: 12 },
