@@ -27,14 +27,14 @@ const getStudent = async (req, res) => {
 
 const createStudent = async (req, res) => {
   try {
-    const { roll_number, name, section_id, email, phone } = req.body;
+    const { roll_number, name, section_id, email, phone, barcode } = req.body;
     if (!roll_number || !name || !section_id) {
       return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Roll number, name, and section are required' });
     }
 
     const college = await College.findById(req.user.college_id);
     const student = await Student.create({
-      roll_number, name, section_id, college_id: req.user.college_id, email, phone
+      roll_number, name, section_id, college_id: req.user.college_id, email, phone, barcode
     }, college.code);
 
     res.status(201).json({ success: true, data: student });

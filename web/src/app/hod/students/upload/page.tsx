@@ -70,11 +70,11 @@ export default function UploadStudentsPage() {
       <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
         <h3 className="font-semibold text-blue-900 mb-2">CSV Format Required</h3>
         <div className="bg-white rounded-xl p-3 font-mono text-xs text-gray-600 overflow-x-auto">
-          <div className="text-blue-600 font-bold">roll_number,name,email,phone,section</div>
-          <div>CS2024001,John Smith,john@college.com,9876543210,CS2</div>
-          <div>CS2024002,Jane Doe,jane@college.com,9876543211,CS2</div>
+          <div className="text-blue-600 font-bold">roll_number,name,email,phone,section,barcode</div>
+          <div>CS2024001,John Smith,john@college.com,9876543210,CS2,ABC123</div>
+          <div>CS2024002,Jane Doe,jane@college.com,9876543211,CS2,DEF456</div>
         </div>
-        <p className="text-xs text-blue-700 mt-2">QR codes will be auto-generated for each student</p>
+        <p className="text-xs text-blue-700 mt-2"><strong>barcode</strong> = the barcode number on the student&apos;s ID card (optional — auto-generated if empty)</p>
       </div>
 
       {/* Upload Area */}

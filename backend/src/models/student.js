@@ -56,8 +56,8 @@ const Student = {
     return result.rows;
   },
 
-  create: async ({ roll_number, name, section_id, college_id, email, phone }, collegeCode) => {
-    const barcode_data = generateBarcodeData(roll_number, collegeCode);
+  create: async ({ roll_number, name, section_id, college_id, email, phone, barcode }, collegeCode) => {
+    const barcode_data = barcode || generateBarcodeData(roll_number, collegeCode);
     const result = await pool.query(
       'INSERT INTO students (roll_number, name, section_id, college_id, email, phone, barcode_data) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
       [roll_number, name, section_id, college_id, email, phone, barcode_data]
@@ -74,7 +74,7 @@ const Student = {
 
       for (let i = 0; i < students.length; i++) {
         try {
-          const { roll_number, name, section, email, phone } = students[i];
+          const { roll_number, name, section, email, phone, barcode } = students[i];
 
           const sectionResult = await client.query(
             'SELECT s.id FROM sections s JOIN departments d ON s.department_id = d.id WHERE s.name = $1 AND d.college_id = $2',
@@ -86,7 +86,7 @@ const Student = {
             continue;
           }
 
-          const barcode_data = generateBarcodeData(roll_number, collegeCode);
+          const barcode_data = barcode || generateBarcodeData(roll_number, collegeCode);
           await client.query(
             'INSERT INTO students (roll_number, name, section_id, college_id, email, phone, barcode_data) VALUES ($1, $2, $3, $4, $5, $6, $7)',
             [roll_number, name, sectionResult.rows[0].id, collegeId, email, phone, barcode_data]
