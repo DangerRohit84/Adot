@@ -10,7 +10,6 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterSection, setFilterSection] = useState("");
-  const [showQR, setShowQR] = useState<{ id: string; qr: string; name: string } | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -38,15 +37,6 @@ export default function StudentsPage() {
     const matchSection = !filterSection || s.section_id === filterSection;
     return matchSearch && matchSection;
   });
-
-  const viewQR = async (id: string, name: string) => {
-    try {
-      const { data } = await api.get(`/students/${id}/qr`);
-      setShowQR({ id, qr: data.data.qr, name });
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -145,12 +135,7 @@ export default function StudentsPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{student.department_name}</td>
                     <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => viewQR(student.id, student.name)}
-                        className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-medium hover:bg-indigo-100 transition-colors"
-                      >
-                        View QR
-                      </button>
+                      <span className="text-xs text-gray-400">ID: {student.barcode_data}</span>
                     </td>
                   </tr>
                 ))}
@@ -160,35 +145,6 @@ export default function StudentsPage() {
         )}
       </div>
 
-      {/* QR Code Modal */}
-      {showQR && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowQR(null)}>
-          <div className="bg-white rounded-2xl p-8 max-w-sm w-full animate-fade-in" onClick={(e) => e.stopPropagation()}>
-            <div className="text-center">
-              <h3 className="text-lg font-bold text-gray-900 mb-1">{showQR.name}</h3>
-              <p className="text-sm text-gray-500 mb-6">Student QR Code</p>
-              <div className="bg-white p-4 rounded-xl border-2 border-gray-100 inline-block">
-                <img src={showQR.qr} alt="QR Code" className="w-48 h-48" />
-              </div>
-              <div className="mt-6 flex gap-3">
-                <button
-                  onClick={() => setShowQR(null)}
-                  className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-200 transition-colors"
-                >
-                  Close
-                </button>
-                <a
-                  href={showQR.qr}
-                  download={`qr-${showQR.name}.png`}
-                  className="flex-1 px-4 py-2.5 bg-indigo-500 text-white rounded-xl font-medium text-sm hover:bg-indigo-600 transition-colors text-center"
-                >
-                  Download
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

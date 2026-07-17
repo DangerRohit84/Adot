@@ -57,7 +57,7 @@ const Student = {
   },
 
   create: async ({ roll_number, name, section_id, college_id, email, phone, barcode }, collegeCode) => {
-    const barcode_data = barcode || generateBarcodeData(roll_number, collegeCode);
+    const barcode_data = barcode || roll_number;
     const result = await pool.query(
       'INSERT INTO students (roll_number, name, section_id, college_id, email, phone, barcode_data) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
       [roll_number, name, section_id, college_id, email, phone, barcode_data]
@@ -86,7 +86,7 @@ const Student = {
             continue;
           }
 
-          const barcode_data = barcode || generateBarcodeData(roll_number, collegeCode);
+          const barcode_data = barcode || roll_number;
           await client.query(
             'INSERT INTO students (roll_number, name, section_id, college_id, email, phone, barcode_data) VALUES ($1, $2, $3, $4, $5, $6, $7)',
             [roll_number, name, sectionResult.rows[0].id, collegeId, email, phone, barcode_data]
