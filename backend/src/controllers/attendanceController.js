@@ -2,7 +2,7 @@ const AttendanceSession = require('../models/attendanceSession');
 const AttendanceRecord = require('../models/attendanceRecord');
 const Timetable = require('../models/timetable');
 const Student = require('../models/student');
-const FloatingStudent = require('../models/floatingStudent');
+const StudentTeacherSelection = require('../models/studentTeacherSelection');
 const { emitToCollege } = require('../utils/socket');
 
 const getSessions = async (req, res) => {
@@ -62,23 +62,29 @@ const getStudentsForSession = async (session) => {
   const timetable = await Timetable.findById(session.timetable_id);
   const sectionId = timetable.section_id;
 
-  if (timetable.combined_group_id) {
-    const combined = await Timetable.findCombinedGroup(
-      timetable.combined_group_id,
-      timetable.day_of_week,
-      timetable.start_period
-    );
-    const sectionIds = combined.map(c => c.section_id);
-    const students = await Student.findBySections(sectionIds);
-    // Also include floating students from other sections targeting these sections
-    const floatingStudents = await Student.findFloatingToSections(sectionIds);
-    return [...students, ...floatingStudents.filter(fs => !students.find(s => s.id === fs.id))];
+  // Get students from the section
+  const sectionStudents = await Student.findBySection(sectionId);
+
+  // Get students from other sections who selected this teacher for this subject
+  const allocatedStudents = await StudentTeacherSelection.findByTeacherAndSubject(
+    timetable.teacher_id, timetable.subject_id
+  );
+
+  // Merge, avoiding duplicates
+  const allStudents = [...sectionStudents];
+  for (const alloc of allocatedStudents) {
+    if (!allStudents.find(s => s.id === alloc.student_id)) {
+      allStudents.push({
+        id: alloc.student_id,
+        roll_number: alloc.roll_number,
+        name: alloc.student_name,
+        section_id: sectionId,
+        section_name: alloc.section_name,
+      });
+    }
   }
 
-  const students = await Student.findBySection(sectionId);
-  // Include floating students from other sections targeting this section
-  const floatingStudents = await Student.findFloatingToSections([sectionId]);
-  return [...students, ...floatingStudents.filter(fs => !students.find(s => s.id === fs.id))];
+  return allStudents;
 };
 
 const getPeriodsCovered = (session) => {
@@ -124,15 +130,16 @@ const scanStudent = async (req, res) => {
     // Get timetable for period range
     const timetable = await Timetable.findById(session.timetable_id);
 
-    // Validate student belongs to this section (or is floating to it)
+    // Validate student belongs to this section OR has selected this teacher for this subject
     let isFloating = false;
     if (student.section_id !== timetable.section_id) {
-      const allowed = await FloatingStudent.canFloat(student.id, timetable.section_id);
-      if (!allowed) {
+      // Check if student has a teacher selection for this subject+teacher
+      const allocation = await StudentTeacherSelection.findAllocation(student.id, timetable.teacher_id, timetable.subject_id);
+      if (!allocation) {
         return res.status(400).json({
           success: false,
           error: 'WRONG_SECTION',
-          message: `Student belongs to ${student.section_name}, not this class`,
+          message: `Student belongs to ${student.section_name} and has not selected this teacher`,
         });
       }
       isFloating = true;
